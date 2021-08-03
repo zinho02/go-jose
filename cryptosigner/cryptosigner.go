@@ -23,6 +23,7 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/pqc"
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/asn1"
@@ -30,7 +31,6 @@ import (
 	"math/big"
 
 	"github.com/zinho02/go-jose"
-	"github.com/zinho02/go/src/crypto/pqc"
 )
 
 // Opaque creates an OpaqueSigner from a "crypto".Signer
@@ -61,7 +61,7 @@ func (s *cryptoSigner) Algs() []jose.SignatureAlgorithm {
 	case *rsa.PublicKey:
 		return []jose.SignatureAlgorithm{jose.RS256, jose.RS384, jose.RS512, jose.PS256, jose.PS384, jose.PS512}
 	case *pqc.PublicKey:
-		return []jose.SignatureAlgorithm{jose.PQC}
+		return []jose.SignatureAlgorithm{jose.Dilithium5}
 	default:
 		return nil
 	}
@@ -78,7 +78,7 @@ func (s *cryptoSigner) SignPayload(payload []byte, alg jose.SignatureAlgorithm) 
 		hash = crypto.SHA384
 	case jose.RS512, jose.PS512, jose.ES512:
 		hash = crypto.SHA512
-	case jose.PQC:
+	case jose.Dilithium5:
 		return s.signer.Sign(nil, payload, nil)
 	default:
 		return nil, jose.ErrUnsupportedAlgorithm

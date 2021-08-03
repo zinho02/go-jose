@@ -491,6 +491,8 @@ func TestMarshalUnmarshal(t *testing.T) {
 		rsaTestKey.Public(),
 		ed25519PrivateKey,
 		ed25519PrivateKey.Public(),
+		pqcTestKey,
+		pqcTestKey.Public(),
 	} {
 		for _, use := range []string{"", "sig", "enc"} {
 			jwk := JSONWebKey{Key: key, KeyID: kid, Algorithm: "foo"}

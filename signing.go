@@ -19,13 +19,12 @@ package jose
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/pqc"
 	"crypto/rsa"
 	"encoding/base64"
 	"errors"
 	"fmt"
-
-	"github.com/zinho02/go/src/crypto/pqc"
-	"golang.org/x/crypto/ed25519"
 
 	"gopkg.in/square/go-jose.v2/json"
 )

@@ -21,6 +21,7 @@ import (
 	"crypto/aes"
 	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/pqc"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
@@ -31,7 +32,6 @@ import (
 
 	josecipher "github.com/zinho02/go-jose/cipher"
 	"github.com/zinho02/go-jose/json"
-	"github.com/zinho02/go/src/crypto/pqc"
 )
 
 // A generic PQC-based encrypter/verifier

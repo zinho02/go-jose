@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"crypto/pqc"
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
@@ -33,6 +34,8 @@ import (
 )
 
 // We generate only a single RSA and EC key for testing, speeds up tests.
+var pqcTestKey, _ = pqc.GenerateKey("dilithium5")
+
 var rsaTestKey, _ = rsa.GenerateKey(rand.Reader, 2048)
 
 var ecTestKey256, _ = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)

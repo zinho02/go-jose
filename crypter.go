@@ -18,13 +18,13 @@ package jose
 
 import (
 	"crypto/ecdsa"
+	"crypto/pqc"
 	"crypto/rsa"
 	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/zinho02/go-jose/json"
-	"github.com/zinho02/go/src/crypto/pqc"
 )
 
 // Encrypter represents an encrypter which produces an encrypted JWE object.

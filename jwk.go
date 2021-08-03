@@ -20,7 +20,9 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/elliptic"
+	"crypto/pqc"
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/sha256"
@@ -33,8 +35,6 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
-
-	"golang.org/x/crypto/ed25519"
 
 	"gopkg.in/square/go-jose.v2/json"
 )
@@ -55,12 +55,14 @@ type rawJSONWebKey struct {
 	// RSA uses D, P and Q, while ECDSA uses only D. Fields Dp, Dq, and Qi are
 	// completely optional. Therefore for RSA/ECDSA, D != nil is a contract that
 	// we have a private key whereas D == nil means we have only a public key.
-	D  *byteBuffer `json:"d,omitempty"`
-	P  *byteBuffer `json:"p,omitempty"`
-	Q  *byteBuffer `json:"q,omitempty"`
-	Dp *byteBuffer `json:"dp,omitempty"`
-	Dq *byteBuffer `json:"dq,omitempty"`
-	Qi *byteBuffer `json:"qi,omitempty"`
+	D       *byteBuffer `json:"d,omitempty"`
+	P       *byteBuffer `json:"p,omitempty"`
+	Q       *byteBuffer `json:"q,omitempty"`
+	Dp      *byteBuffer `json:"dp,omitempty"`
+	Dq      *byteBuffer `json:"dq,omitempty"`
+	Qi      *byteBuffer `json:"qi,omitempty"`
+	PQCPub  *byteBuffer `json:"pqcpub,omitempty"`
+	PQCPriv *byteBuffer `json:"pqcpriv,omitempty"`
 	// Certificates
 	X5c       []string `json:"x5c,omitempty"`
 	X5u       *url.URL `json:"x5u,omitempty"`
@@ -95,6 +97,10 @@ func (k JSONWebKey) MarshalJSON() ([]byte, error) {
 	var err error
 
 	switch key := k.Key.(type) {
+	case *pqc.PublicKey:
+		raw = fromPQCPublicKey(key)
+	case *pqc.PrivateKey:
+		raw, err = fromPQCPrivateKey(key)
 	case ed25519.PublicKey:
 		raw = fromEdPublicKey(key)
 	case *ecdsa.PublicKey:
@@ -189,6 +195,16 @@ func (k *JSONWebKey) UnmarshalJSON(data []byte) (err error) {
 	}
 
 	switch raw.Kty {
+	case "dilithium5":
+		if raw.PQCPriv != nil {
+			key, err = raw.pqcPrivateKey()
+			if err == nil {
+				keyPub = key.(*pqc.PrivateKey).Public()
+			}
+		} else {
+			key, err = raw.pqcPublicKey()
+			keyPub = key
+		}
 	case "EC":
 		if raw.D != nil {
 			key, err = raw.ecPrivateKey()
@@ -333,6 +349,7 @@ func (s *JSONWebKeySet) Key(kid string) []JSONWebKey {
 const rsaThumbprintTemplate = `{"e":"%s","kty":"RSA","n":"%s"}`
 const ecThumbprintTemplate = `{"crv":"%s","kty":"EC","x":"%s","y":"%s"}`
 const edThumbprintTemplate = `{"crv":"%s","kty":"OKP","x":"%s"}`
+const pqcThumbprintTemplate = `{"pub":"%s","kty":"%s"}`
 
 func ecThumbprintInput(curve elliptic.Curve, x, y *big.Int) (string, error) {
 	coordLength := curveSize(curve)
@@ -348,6 +365,12 @@ func ecThumbprintInput(curve elliptic.Curve, x, y *big.Int) (string, error) {
 	return fmt.Sprintf(ecThumbprintTemplate, crv,
 		newFixedSizeBuffer(x.Bytes(), coordLength).base64(),
 		newFixedSizeBuffer(y.Bytes(), coordLength).base64()), nil
+}
+
+func pqcThumbprintInput(k *pqc.PublicKey) (string, error) {
+	return fmt.Sprintf(pqcThumbprintTemplate,
+		newBuffer(k.Bytes).base64(),
+		newBuffer([]byte(k.AlgName)).base64()), nil
 }
 
 func rsaThumbprintInput(n *big.Int, e int) (string, error) {
@@ -371,6 +394,10 @@ func (k *JSONWebKey) Thumbprint(hash crypto.Hash) ([]byte, error) {
 	var input string
 	var err error
 	switch key := k.Key.(type) {
+	case *pqc.PublicKey:
+		input, err = pqcThumbprintInput(key)
+	case *pqc.PrivateKey:
+		input, err = pqcThumbprintInput(&key.PublicKey)
 	case ed25519.PublicKey:
 		input, err = edThumbprintInput(key)
 	case *ecdsa.PublicKey:
@@ -399,7 +426,7 @@ func (k *JSONWebKey) Thumbprint(hash crypto.Hash) ([]byte, error) {
 // IsPublic returns true if the JWK represents a public key (not symmetric, not private).
 func (k *JSONWebKey) IsPublic() bool {
 	switch k.Key.(type) {
-	case *ecdsa.PublicKey, *rsa.PublicKey, ed25519.PublicKey:
+	case *ecdsa.PublicKey, *rsa.PublicKey, ed25519.PublicKey, *pqc.PublicKey:
 		return true
 	default:
 		return false
@@ -413,6 +440,8 @@ func (k *JSONWebKey) Public() JSONWebKey {
 	}
 	ret := *k
 	switch key := k.Key.(type) {
+	case *pqc.PrivateKey:
+		ret.Key = key.Public()
 	case *ecdsa.PrivateKey:
 		ret.Key = key.Public()
 	case *rsa.PrivateKey:
@@ -431,6 +460,10 @@ func (k *JSONWebKey) Valid() bool {
 		return false
 	}
 	switch key := k.Key.(type) {
+	case *pqc.PublicKey:
+		if key.Bytes == nil {
+			return false
+		}
 	case *ecdsa.PublicKey:
 		if key.Curve == nil || key.X == nil || key.Y == nil {
 			return false
@@ -461,6 +494,13 @@ func (k *JSONWebKey) Valid() bool {
 	return true
 }
 
+func (key rawJSONWebKey) pqcPublicKey() (*pqc.PublicKey, error) {
+	return &pqc.PublicKey{
+		AlgName: key.Kty,
+		Bytes:   key.PQCPub.bytes(),
+	}, nil
+}
+
 func (key rawJSONWebKey) rsaPublicKey() (*rsa.PublicKey, error) {
 	if key.N == nil || key.E == nil {
 		return nil, fmt.Errorf("square/go-jose: invalid RSA key, missing n/e values")
@@ -477,6 +517,13 @@ func fromEdPublicKey(pub ed25519.PublicKey) *rawJSONWebKey {
 		Kty: "OKP",
 		Crv: "Ed25519",
 		X:   newBuffer(pub),
+	}
+}
+
+func fromPQCPublicKey(pub *pqc.PublicKey) *rawJSONWebKey {
+	return &rawJSONWebKey{
+		Kty:    pub.AlgName,
+		PQCPub: newBuffer(pub.Bytes),
 	}
 }
 
@@ -589,6 +636,19 @@ func (key rawJSONWebKey) edPublicKey() (ed25519.PublicKey, error) {
 	return rv, nil
 }
 
+func (key rawJSONWebKey) pqcPrivateKey() (*pqc.PrivateKey, error) {
+	privKey := &pqc.PrivateKey{
+		PublicKey: pqc.PublicKey{
+			AlgName: key.Kty,
+			Bytes:   key.PQCPub.bytes(),
+		},
+	}
+
+	privKey.Signer.Init(key.Kty, key.PQCPriv.bytes())
+
+	return privKey, nil
+}
+
 func (key rawJSONWebKey) rsaPrivateKey() (*rsa.PrivateKey, error) {
 	var missing []string
 	switch {
@@ -638,6 +698,14 @@ func fromEdPrivateKey(ed ed25519.PrivateKey) (*rawJSONWebKey, error) {
 	raw := fromEdPublicKey(ed25519.PublicKey(ed[32:]))
 
 	raw.D = newBuffer(ed[0:32])
+	return raw, nil
+}
+
+func fromPQCPrivateKey(pqc *pqc.PrivateKey) (*rawJSONWebKey, error) {
+	raw := fromPQCPublicKey(&pqc.PublicKey)
+
+	raw.PQCPriv = newBuffer(pqc.Signer.ExportSecretKey())
+
 	return raw, nil
 }
 
