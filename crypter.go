@@ -23,7 +23,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"gopkg.in/square/go-jose.v2/json"
+	"github.com/zinho02/go-jose/json"
+	"github.com/zinho02/go/src/crypto/pqc"
 )
 
 // Encrypter represents an encrypter which produces an encrypted JWE object.
@@ -258,6 +259,8 @@ func (ctx *genericEncrypter) addRecipient(recipient Recipient) (err error) {
 
 func makeJWERecipient(alg KeyAlgorithm, encryptionKey interface{}) (recipientKeyInfo, error) {
 	switch encryptionKey := encryptionKey.(type) {
+	case *pqc.PublicKey:
+		return newPQCRecipient(alg, encryptionKey)
 	case *rsa.PublicKey:
 		return newRSARecipient(alg, encryptionKey)
 	case *ecdsa.PublicKey:
@@ -280,6 +283,10 @@ func makeJWERecipient(alg KeyAlgorithm, encryptionKey interface{}) (recipientKey
 // newDecrypter creates an appropriate decrypter based on the key type
 func newDecrypter(decryptionKey interface{}) (keyDecrypter, error) {
 	switch decryptionKey := decryptionKey.(type) {
+	case *pqc.PrivateKey:
+		return &pqcDecrypterSigner{
+			privateKey: decryptionKey,
+		}, nil
 	case *rsa.PrivateKey:
 		return &rsaDecrypterSigner{
 			privateKey: decryptionKey,
