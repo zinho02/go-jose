@@ -387,6 +387,8 @@ func (ctx pqcEncrypterVerifier) verifyPayload(payload []byte, signature []byte, 
 	switch alg {
 	case Dilithium5:
 		algName = "dilithium5"
+	case Falcon1024:
+		algName = "falcon1024"
 	}
 
 	if pqc.Verify(payload, signature, ctx.publicKey, algName) {

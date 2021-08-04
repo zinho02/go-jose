@@ -195,7 +195,7 @@ func (k *JSONWebKey) UnmarshalJSON(data []byte) (err error) {
 	}
 
 	switch raw.Kty {
-	case "dilithium5":
+	case "dilithium5", "falcon1024":
 		if raw.PQCPriv != nil {
 			key, err = raw.pqcPrivateKey()
 			if err == nil {

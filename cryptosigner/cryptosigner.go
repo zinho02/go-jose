@@ -61,7 +61,7 @@ func (s *cryptoSigner) Algs() []jose.SignatureAlgorithm {
 	case *rsa.PublicKey:
 		return []jose.SignatureAlgorithm{jose.RS256, jose.RS384, jose.RS512, jose.PS256, jose.PS384, jose.PS512}
 	case *pqc.PublicKey:
-		return []jose.SignatureAlgorithm{jose.Dilithium5}
+		return []jose.SignatureAlgorithm{jose.Dilithium5, jose.Falcon1024}
 	default:
 		return nil
 	}
@@ -78,7 +78,7 @@ func (s *cryptoSigner) SignPayload(payload []byte, alg jose.SignatureAlgorithm) 
 		hash = crypto.SHA384
 	case jose.RS512, jose.PS512, jose.ES512:
 		hash = crypto.SHA512
-	case jose.Dilithium5:
+	case jose.Dilithium5, jose.Falcon1024:
 		return s.signer.Sign(nil, payload, nil)
 	default:
 		return nil, jose.ErrUnsupportedAlgorithm
