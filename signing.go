@@ -197,6 +197,8 @@ func (ctx *genericSigner) addRecipient(alg SignatureAlgorithm, signingKey interf
 
 func makeJWSRecipient(alg SignatureAlgorithm, signingKey interface{}) (recipientSigInfo, error) {
 	switch signingKey := signingKey.(type) {
+	case pqc.PrivateKey:
+		return newPQCSigner(alg, &signingKey)
 	case *pqc.PrivateKey:
 		return newPQCSigner(alg, signingKey)
 	case ed25519.PrivateKey:

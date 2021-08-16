@@ -97,6 +97,10 @@ func (k JSONWebKey) MarshalJSON() ([]byte, error) {
 	var err error
 
 	switch key := k.Key.(type) {
+	case pqc.PublicKey:
+		raw = fromPQCPublicKey(&key)
+	case pqc.PrivateKey:
+		raw, err = fromPQCPrivateKey(&key)
 	case *pqc.PublicKey:
 		raw = fromPQCPublicKey(key)
 	case *pqc.PrivateKey:
@@ -394,6 +398,10 @@ func (k *JSONWebKey) Thumbprint(hash crypto.Hash) ([]byte, error) {
 	var input string
 	var err error
 	switch key := k.Key.(type) {
+	case pqc.PublicKey:
+		input, err = pqcThumbprintInput(&key)
+	case pqc.PrivateKey:
+		input, err = pqcThumbprintInput(&key.PublicKey)
 	case *pqc.PublicKey:
 		input, err = pqcThumbprintInput(key)
 	case *pqc.PrivateKey:
