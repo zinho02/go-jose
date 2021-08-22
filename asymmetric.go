@@ -382,16 +382,7 @@ func (ctx rsaDecrypterSigner) signPayload(payload []byte, alg SignatureAlgorithm
 
 // Verify the given payload
 func (ctx pqcEncrypterVerifier) verifyPayload(payload []byte, signature []byte, alg SignatureAlgorithm) error {
-	var algName string
-
-	switch alg {
-	case Dilithium5:
-		algName = "dilithium5"
-	case Falcon1024:
-		algName = "falcon-1024"
-	}
-
-	if pqc.Verify(payload, signature, ctx.publicKey, algName) {
+	if ctx.publicKey.Verify(payload, signature) {
 		return nil
 	}
 	return ErrUnsupportedAlgorithm
