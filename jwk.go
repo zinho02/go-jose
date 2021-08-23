@@ -199,7 +199,12 @@ func (k *JSONWebKey) UnmarshalJSON(data []byte) (err error) {
 	}
 
 	switch raw.Kty {
-	case "dilithium5", "falcon-1024":
+	case "dilithium5", "dilithium5-aes", "falcon-1024", "rainbow-v-classic", "rainbow-v-circumzenithal",
+		"rainbow-v-compressed", "sphincs+-haraka-256s-simple", "sphincs+-haraka-256f-simple",
+		"sphincs+-haraka-256s-robust", "sphincs+-haraka-256f-robust", "sphincs+-sha256-256s-simple",
+		"sphincs+-sha256-256f-simple", "sphincs+-sha256-256s-robust", "sphincs+-sha256-256f-robust",
+		"sphincs+-shake256-256s-simple", "sphincs+-shake256-256f-simple", "sphincs+-shake256-256s-robust",
+		"sphincs+-shake256-256f-robust":
 		if raw.PQCPriv != nil {
 			key, err = raw.pqcPrivateKey()
 			if err == nil {

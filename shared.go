@@ -97,21 +97,37 @@ const (
 
 // Signature algorithms
 const (
-	EdDSA      = SignatureAlgorithm("EdDSA")
-	HS256      = SignatureAlgorithm("HS256") // HMAC using SHA-256
-	HS384      = SignatureAlgorithm("HS384") // HMAC using SHA-384
-	HS512      = SignatureAlgorithm("HS512") // HMAC using SHA-512
-	RS256      = SignatureAlgorithm("RS256") // RSASSA-PKCS-v1.5 using SHA-256
-	RS384      = SignatureAlgorithm("RS384") // RSASSA-PKCS-v1.5 using SHA-384
-	RS512      = SignatureAlgorithm("RS512") // RSASSA-PKCS-v1.5 using SHA-512
-	ES256      = SignatureAlgorithm("ES256") // ECDSA using P-256 and SHA-256
-	ES384      = SignatureAlgorithm("ES384") // ECDSA using P-384 and SHA-384
-	ES512      = SignatureAlgorithm("ES512") // ECDSA using P-521 and SHA-512
-	PS256      = SignatureAlgorithm("PS256") // RSASSA-PSS using SHA256 and MGF1-SHA256
-	PS384      = SignatureAlgorithm("PS384") // RSASSA-PSS using SHA384 and MGF1-SHA384
-	PS512      = SignatureAlgorithm("PS512") // RSASSA-PSS using SHA512 and MGF1-SHA512
-	Dilithium5 = SignatureAlgorithm("Dilithium5")
-	Falcon1024 = SignatureAlgorithm("Falcon-1024")
+	EdDSA                         = SignatureAlgorithm("EdDSA")
+	HS256                         = SignatureAlgorithm("HS256") // HMAC using SHA-256
+	HS384                         = SignatureAlgorithm("HS384") // HMAC using SHA-384
+	HS512                         = SignatureAlgorithm("HS512") // HMAC using SHA-512
+	RS256                         = SignatureAlgorithm("RS256") // RSASSA-PKCS-v1.5 using SHA-256
+	RS384                         = SignatureAlgorithm("RS384") // RSASSA-PKCS-v1.5 using SHA-384
+	RS512                         = SignatureAlgorithm("RS512") // RSASSA-PKCS-v1.5 using SHA-512
+	ES256                         = SignatureAlgorithm("ES256") // ECDSA using P-256 and SHA-256
+	ES384                         = SignatureAlgorithm("ES384") // ECDSA using P-384 and SHA-384
+	ES512                         = SignatureAlgorithm("ES512") // ECDSA using P-521 and SHA-512
+	PS256                         = SignatureAlgorithm("PS256") // RSASSA-PSS using SHA256 and MGF1-SHA256
+	PS384                         = SignatureAlgorithm("PS384") // RSASSA-PSS using SHA384 and MGF1-SHA384
+	PS512                         = SignatureAlgorithm("PS512") // RSASSA-PSS using SHA512 and MGF1-SHA512
+	Dilithium5                    = SignatureAlgorithm("Dilithium5")
+	Dilithium5AES                 = SignatureAlgorithm("Dilithium5-AES")
+	Falcon1024                    = SignatureAlgorithm("Falcon-1024")
+	RainbowVClassic               = SignatureAlgorithm("Rainbow-V-Classic")
+	RainbowVCircumzenithal        = SignatureAlgorithm("Rainbow-V-Circumzenithal")
+	RainbowVCompressed            = SignatureAlgorithm("Rainbow-V-Compressed")
+	SphincsPlusHaraka256sSimple   = SignatureAlgorithm("SPHINCS+-Haraka-256s-Simple")
+	SphincsPlusHaraka256fSimple   = SignatureAlgorithm("SPHINCS+-Haraka-256f-Simple")
+	SphincsPlusHaraka256sRobust   = SignatureAlgorithm("SPHINCS+-Haraka-256s-Robust")
+	SphincsPlusHaraka256fRobust   = SignatureAlgorithm("SPHINCS+-Haraka-256f-Robust")
+	SphincsPlusSHA256256fSimple   = SignatureAlgorithm("SPHINCS+-SHA256-256s-Simple")
+	SphincsPlusSHA256256sSimple   = SignatureAlgorithm("SPHINCS+-SHA256-256f-Simple")
+	SphincsPlusSHA256256sRobust   = SignatureAlgorithm("SPHINCS+-SHA256-256s-Robust")
+	SphincsPlusSHA256256fRobust   = SignatureAlgorithm("SPHINCS+-SHA256-256f-Robust")
+	SphincsPlusSHAKE256256sSimple = SignatureAlgorithm("SPHINCS+-SHAKE256-256s-Simple")
+	SphincsPlusSHAKE256256fSimple = SignatureAlgorithm("SPHINCS+-SHAKE256-256f-Simple")
+	SphincsPlusSHAKE256256sRobust = SignatureAlgorithm("SPHINCS+-SHAKE256-256s-Robust")
+	SphincsPlusSHAKE256256fRobust = SignatureAlgorithm("SPHINCS+-SHAKE256-256f-Robust")
 )
 
 // Content encryption algorithms

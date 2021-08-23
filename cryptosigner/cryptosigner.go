@@ -61,7 +61,12 @@ func (s *cryptoSigner) Algs() []jose.SignatureAlgorithm {
 	case *rsa.PublicKey:
 		return []jose.SignatureAlgorithm{jose.RS256, jose.RS384, jose.RS512, jose.PS256, jose.PS384, jose.PS512}
 	case *pqc.PublicKey:
-		return []jose.SignatureAlgorithm{jose.Dilithium5, jose.Falcon1024}
+		return []jose.SignatureAlgorithm{jose.Dilithium5, jose.Dilithium5AES, jose.Falcon1024, jose.RainbowVClassic,
+			jose.RainbowVCircumzenithal, jose.RainbowVCompressed, jose.SphincsPlusHaraka256sSimple,
+			jose.SphincsPlusHaraka256fSimple, jose.SphincsPlusHaraka256sRobust, jose.SphincsPlusHaraka256fRobust,
+			jose.SphincsPlusSHA256256fSimple, jose.SphincsPlusSHA256256sSimple, jose.SphincsPlusSHA256256sRobust,
+			jose.SphincsPlusSHA256256fRobust, jose.SphincsPlusSHAKE256256sSimple, jose.SphincsPlusSHAKE256256fSimple,
+			jose.SphincsPlusSHAKE256256sRobust, jose.SphincsPlusSHAKE256256fRobust}
 	default:
 		return nil
 	}
@@ -78,7 +83,12 @@ func (s *cryptoSigner) SignPayload(payload []byte, alg jose.SignatureAlgorithm) 
 		hash = crypto.SHA384
 	case jose.RS512, jose.PS512, jose.ES512:
 		hash = crypto.SHA512
-	case jose.Dilithium5, jose.Falcon1024:
+	case jose.Dilithium5, jose.Dilithium5AES, jose.Falcon1024, jose.RainbowVClassic,
+		jose.RainbowVCircumzenithal, jose.RainbowVCompressed, jose.SphincsPlusHaraka256sSimple,
+		jose.SphincsPlusHaraka256fSimple, jose.SphincsPlusHaraka256sRobust, jose.SphincsPlusHaraka256fRobust,
+		jose.SphincsPlusSHA256256fSimple, jose.SphincsPlusSHA256256sSimple, jose.SphincsPlusSHA256256sRobust,
+		jose.SphincsPlusSHA256256fRobust, jose.SphincsPlusSHAKE256256sSimple, jose.SphincsPlusSHAKE256256fSimple,
+		jose.SphincsPlusSHAKE256256sRobust, jose.SphincsPlusSHAKE256256fRobust:
 		return s.signer.Sign(nil, payload, nil)
 	default:
 		return nil, jose.ErrUnsupportedAlgorithm
