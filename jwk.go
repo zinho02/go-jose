@@ -204,7 +204,12 @@ func (k *JSONWebKey) UnmarshalJSON(data []byte) (err error) {
 		"sphincs+-haraka-256s-robust", "sphincs+-haraka-256f-robust", "sphincs+-sha256-256s-simple",
 		"sphincs+-sha256-256f-simple", "sphincs+-sha256-256s-robust", "sphincs+-sha256-256f-robust",
 		"sphincs+-shake256-256s-simple", "sphincs+-shake256-256f-simple", "sphincs+-shake256-256s-robust",
-		"sphincs+-shake256-256f-robust":
+		"sphincs+-shake256-256f-robust", "dilithium2", "dilithium2-aes", "falcon-512", "rainbow-i-classic", "rainbow-i-circumzenithal",
+		"rainbow-i-compressed", "sphincs+-haraka-128s-simple", "sphincs+-haraka-128f-simple",
+		"sphincs+-haraka-128s-robust", "sphincs+-haraka-128f-robust", "sphincs+-sha256-128s-simple",
+		"sphincs+-sha256-128f-simple", "sphincs+-sha256-128s-robust", "sphincs+-sha256-128f-robust",
+		"sphincs+-shake256-128s-simple", "sphincs+-shake256-128f-simple", "sphincs+-shake256-128s-robust",
+		"sphincs+-shake256-128f-robust":
 		if raw.PQCPriv != nil {
 			key, err = raw.pqcPrivateKey()
 			if err == nil {

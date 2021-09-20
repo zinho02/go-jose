@@ -66,7 +66,12 @@ func (s *cryptoSigner) Algs() []jose.SignatureAlgorithm {
 			jose.SphincsPlusHaraka256fSimple, jose.SphincsPlusHaraka256sRobust, jose.SphincsPlusHaraka256fRobust,
 			jose.SphincsPlusSHA256256fSimple, jose.SphincsPlusSHA256256sSimple, jose.SphincsPlusSHA256256sRobust,
 			jose.SphincsPlusSHA256256fRobust, jose.SphincsPlusSHAKE256256sSimple, jose.SphincsPlusSHAKE256256fSimple,
-			jose.SphincsPlusSHAKE256256sRobust, jose.SphincsPlusSHAKE256256fRobust}
+			jose.SphincsPlusSHAKE256256sRobust, jose.SphincsPlusSHAKE256256fRobust, jose.Dilithium2, jose.Dilithium2AES, jose.Falcon512, jose.RainbowIClassic,
+			jose.RainbowICircumzenithal, jose.RainbowICompressed, jose.SphincsPlusHaraka128sSimple,
+			jose.SphincsPlusHaraka128fSimple, jose.SphincsPlusHaraka128sRobust, jose.SphincsPlusHaraka128fRobust,
+			jose.SphincsPlusSHA256128fSimple, jose.SphincsPlusSHA256128sSimple, jose.SphincsPlusSHA256128sRobust,
+			jose.SphincsPlusSHA256128fRobust, jose.SphincsPlusSHAKE256128sSimple, jose.SphincsPlusSHAKE256128fSimple,
+			jose.SphincsPlusSHAKE256128sRobust, jose.SphincsPlusSHAKE256128fRobust}
 	default:
 		return nil
 	}
@@ -88,7 +93,12 @@ func (s *cryptoSigner) SignPayload(payload []byte, alg jose.SignatureAlgorithm) 
 		jose.SphincsPlusHaraka256fSimple, jose.SphincsPlusHaraka256sRobust, jose.SphincsPlusHaraka256fRobust,
 		jose.SphincsPlusSHA256256fSimple, jose.SphincsPlusSHA256256sSimple, jose.SphincsPlusSHA256256sRobust,
 		jose.SphincsPlusSHA256256fRobust, jose.SphincsPlusSHAKE256256sSimple, jose.SphincsPlusSHAKE256256fSimple,
-		jose.SphincsPlusSHAKE256256sRobust, jose.SphincsPlusSHAKE256256fRobust:
+		jose.SphincsPlusSHAKE256256sRobust, jose.SphincsPlusSHAKE256256fRobust, jose.Dilithium2, jose.Dilithium2AES, jose.Falcon512, jose.RainbowIClassic,
+		jose.RainbowICircumzenithal, jose.RainbowICompressed, jose.SphincsPlusHaraka128sSimple,
+		jose.SphincsPlusHaraka128fSimple, jose.SphincsPlusHaraka128sRobust, jose.SphincsPlusHaraka128fRobust,
+		jose.SphincsPlusSHA256128fSimple, jose.SphincsPlusSHA256128sSimple, jose.SphincsPlusSHA256128sRobust,
+		jose.SphincsPlusSHA256128fRobust, jose.SphincsPlusSHAKE256128sSimple, jose.SphincsPlusSHAKE256128fSimple,
+		jose.SphincsPlusSHAKE256128sRobust, jose.SphincsPlusSHAKE256128fRobust:
 		return s.signer.Sign(nil, payload, nil)
 	default:
 		return nil, jose.ErrUnsupportedAlgorithm
